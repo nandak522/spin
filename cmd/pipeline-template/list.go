@@ -55,8 +55,16 @@ func NewListCmd(pipelineTemplateOptions *pipelineTemplateOptions) *cobra.Command
 }
 
 func listPipelineTemplate(cmd *cobra.Command, options *listOptions) error {
-	successPayload, resp, err := options.GateClient.V2PipelineTemplatesControllerApi.ListUsingGET1(options.GateClient.Context,
-		&gate.V2PipelineTemplatesControllerApiListUsingGET1Opts{Scopes: optional.NewInterface(*options.scopes)})
+	var opts *gate.V2PipelineTemplatesControllerApiListUsingGET1Opts
+
+	// Only pass scopes if they were explicitly provided (non-empty)
+	if len(*options.scopes) > 0 {
+		opts = &gate.V2PipelineTemplatesControllerApiListUsingGET1Opts{Scopes: optional.NewInterface(*options.scopes)}
+	} else {
+		opts = nil
+	}
+
+	successPayload, resp, err := options.GateClient.V2PipelineTemplatesControllerApi.ListUsingGET1(options.GateClient.Context, opts)
 	if err != nil {
 		return err
 	}
